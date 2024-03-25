@@ -196,9 +196,9 @@ $ ./main_ex1 /tmp/data/records.csv /tmp/data/sorted.csv 27 1
 
 ### Linguaggio richiesto: C
 
-**Attenzione: il testo di questo esercizio non è ancora definitivo e sarà finalizzato all'aggiunta dell'attività coderunner su Moodle.**
+### Testo
 
-Si consideri il problema di determinare la distanza di edit tra due stringhe (Edit distance): date due stringhe s1 e s2, non necessariamente della stessa lunghezza, determinare il minimo numero di operazioni necessarie per trasformare la stringa s2 in s1. Si assuma che le operazioni disponibili siano: cancellazione e inserimento. Esempi:
+Si consideri il problema di determinare la minima distanza di edit tra due stringhe (_edit distance_): date due stringhe $s_1$ e $s_2$, non necessariamente della stessa lunghezza, determinare il minimo numero di operazioni necessarie per trasformare la stringa $s_2$ in $s_1$. Si assuma che le operazioni disponibili siano solo due: **cancellazione** e **inserimento**. Per esempio:
 
 - "casa" e "cassa" hanno edit distance pari a 1 (1 cancellazione);
 - "casa" e "cara" hanno edit distance pari a 2 (1 cancellazione + 1 inserimento);
@@ -206,18 +206,31 @@ Si consideri il problema di determinare la distanza di edit tra due stringhe (Ed
 - "tassa" e "passato" hanno edit distance pari a 4 (3 cancellazioni + 1 inserimento);
 - "pioppo" e "pioppo" hanno edit distance pari a 0.
 
-1. Si implementi una versione ricorsiva della funzione edit\_distance basata sulle seguenti osservazioni (indichiamo con $|s|$ la lunghezza di $s$ e con $\mathrm{rest}(s)$ la sottostringa di $s$ ottenuta ignorando il primo carattere di $s$):
+Si implementi innanzitutto una funzione ricorsiva di calcolo della edit distance, implementando il seguente prototipo di funzione:
 
-- se $|s1|$ = 0, allora $\mathrm{edit\_distance}(s1,s2) = |s2|$;
-- se $|s2|$ = 0, allora $\mathrm{edit\_distance}(s1,s2) = |s1|$;
+```
+int edit_distance(const char *s1, const char* s2);
+```
+
+- `s1` è la stringa che si vuole ottenere $s_1$;
+- `s2` è la stringa di partenza $s_2$.
+
+La funzione si può basare sulle seguenti osservazioni (indichiamo con $|s|$ la lunghezza di $s$ e con $\mathrm{rest}(s)$ la sottostringa di $s$ ottenuta ignorando il primo carattere di $s$):
+
+- se $|s_1|$ = 0, allora $\mathrm{edit\_distance}(s_1,s_2) = |s_2|$;
+- se $|s_2|$ = 0, allora $\mathrm{edit\_distance}(s_1,s_2) = |s_1|$;
 - altrimenti, siano:
   - $d_{\mathrm{no-op}} = \mathrm{edit\_distance}(\mathrm{rest}(s1),\mathrm{rest}(s2))$   se $s1[0]=s2[0]$, $\infty$ altrimenti
-  - $d_{\mathrm{canc}} = 1+ \mathrm{edit\_distance}(s1,\mathrm{rest}(s2))$
-  - $d_{\mathrm{ins}} = 1+ \mathrm{edit\_distance}(\mathrm{rest}(s1),s2)$
+  - $d_{\mathrm{canc}} = 1 + \mathrm{edit\_distance}(s1,\mathrm{rest}(s2))$
+  - $d_{\mathrm{ins}} = 1 + \mathrm{edit\_distance}(\mathrm{rest}(s1),s2)$
 
-Si ha: $\mathrm{edit\_distance}(s1,s2)=\min\{d_{\mathrm{no-op}},d_{\mathrm{canc}},d_{\mathrm{ins}}\}$
+Si ha quindi che: $\mathrm{edit\_distance}(s_1,s_2) = \min\{d_{\mathrm{no-op}}, d_{\mathrm{canc}}, d_{\mathrm{ins}}\}$.
 
-2. Si implementi una seconda versione edit\_distance\_dyn della funzione, adottando una strategia di programmazione dinamica. Tale versione deve essere anch'essa ricorsiva (in particolare, essa può essere facilmente ottenuta a partire dall'implementazione richiesta al punto precedente).
+In seguito, si implementi anche una versione della funzione di calcolo della edit distance che adotta una strategia di programmazione dinamica. Tale versione deve essere anch'essa ricorsiva (in particolare, essa può essere facilmente ottenuta a partire dall'implementazione richiesta al punto precedente). La funzione deve implementare il seguente prototipo:
+
+```
+int edit_distance_dyn(const char *s1, const char* s2);
+```
 
 *Nota*: Le definizioni sopra riportate non corrispondono al modo usuale di definire la distanza di edit. Sono del tutto sufficienti però per risolvere l'esercizio e sono quelle su cui dovrà essere basato il codice prodotto.
 
@@ -237,7 +250,7 @@ Il dizionario contiene un elenco di parole. Le parole sono scritte di seguito, c
 
 Il file `correctme.txt` contiene un testo da correggere. Alcune parole in questo testo non ci sono nel dizionario.
 
-Si implementi un'applicazione che usa la funzione edit\_distance\_dyn per determinare, per ogni parola w in correctme.txt, la lista di parole in dictionary.txt con edit distance minima da w. Si sperimenti il funzionamento dell'applicazione e si riporti in una breve relazione (circa una pagina) i risultati degli esperimenti.
+Si implementi un'applicazione che usa la funzione `edit_distance_dyn` per determinare, per ogni parola `w` in `correctme.txt`, una breve lista di parole in `dictionary.txt` con edit distance minima da `w`. Si sperimenti il funzionamento dell'applicazione e si riporti in una breve relazione i risultati degli esperimenti.
 
 **Si ricorda** che i file `dictionary.txt` e `correctme.txt` non devono essere oggetto di commit su git!
 
@@ -246,10 +259,10 @@ Si implementi un'applicazione che usa la funzione edit\_distance\_dyn per determ
 - Creare una sottocartella chiamata `ex2` all'interno del repository.
 - La consegna deve obbligatoriamente contenere un `Makefile`. Questo file con il comando `make all` deve produrre all'interno di `ex2/bin` due file eseguibili chiamati `main_ex2` e `test_ex2`. Se avete usato librerie esterne (come Unity) includete anche queste per consentire la corretta compilazione.
 - L'eseguibile `test_ex2` non deve richiedere nessun parametro e deve eseguire tutti gli unit test automatizzati prodotti.
-- L'eseguibile `main_ex2` deve ricevere come parametri... Per esempio:
+- L'eseguibile `main_ex2` deve ricevere come parametri il percorso del dizionario da usare come riferimento e il file da correggere. Per esempio:
 
 ```
-$ ./main_ex2 ...
+$ ./main_ex2 /tmp/data/dictionary.txt /tmp/data/correctme.txt
 ```
 
 ## Esercizio 3 - PriorityQueue
