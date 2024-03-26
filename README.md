@@ -232,7 +232,7 @@ In seguito, si implementi anche una versione della funzione di calcolo della edi
 int edit_distance_dyn(const char *s1, const char* s2);
 ```
 
-*Nota*: Le definizioni sopra riportate non corrispondono al modo usuale di definire la distanza di edit. Sono comunque adeguate a risolvere l'esercizio e sono quelle su cui dovrà essere basato il codice prodotto.
+*Nota*: Le definizioni sopra riportate non corrispondono al modo usuale di definire la distanza di edit. Sono comunque quelle necessarie a risolvere l'esercizio e su cui dovrà essere basato il codice prodotto.
 
 ### Unit Testing
 
