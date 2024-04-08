@@ -152,7 +152,7 @@ Implementare gli unit-test per la libreria secondo le indicazioni suggerite nel 
 
 Il file `records.csv` che potete trovare (compresso) all'indirizzo:
 
-> [https://datacloud.di.unito.it/index.php/s/6jQzB7xSQ39kggb](https://datacloud.di.unito.it/index.php/s/6jQzB7xSQ39kggb)
+> [https://datacloud.di.unito.it/index.php/s/9sQmzB9TdDHezX7](https://datacloud.di.unito.it/index.php/s/9sQmzB9TdDHezX7)
 
 contiene 20 milioni di record da ordinare.
 Ogni record è descritto su una riga e contiene i seguenti campi:
@@ -242,7 +242,7 @@ Implementare gli unit-test degli algoritmi secondo le indicazioni suggerite nel 
 
 All'indirizzo:
 
-> [https://datacloud.di.unito.it/index.php/s/baLgprYPcSXJ9gf](https://datacloud.di.unito.it/index.php/s/baLgprYPcSXJ9gf)
+> [https://datacloud.di.unito.it/index.php/s/9BKY7BXFCY4bMcB](https://datacloud.di.unito.it/index.php/s/9BKY7BXFCY4bMcB)
 
 potete trovare un dizionario (`dictionary.txt`) e un file da correggere (`correctme.txt`).
 
@@ -392,7 +392,7 @@ public class Prim {
 L'implementazione dell'algoritmo di Prim dovrà utilizzare la struttura dati *PriorityQueue* implementata nell'esercizio precedente e la struttura dati grafo appena implementata.
 La struttura dati e l'algoritmo di Prim dovranno poi essere utilizzati con i dati contenuti nel file `italian_dist_graph.csv`, che potete recuperare all'indirizzo:
 
-> [https://datacloud.di.unito.it/index.php/s/FxZnWqigoJpFZG3](https://datacloud.di.unito.it/index.php/s/FxZnWqigoJpFZG3)
+> [https://datacloud.di.unito.it/index.php/s/FqneW99EGWLSRpY](https://datacloud.di.unito.it/index.php/s/FqneW99EGWLSRpY)
 
 Tale file contiene le distanze in metri tra varie località italiane e una frazione delle località a loro più vicine. Il formato è un CSV standard: i campi sono separati da virgole; i record sono separati dal carattere di fine riga (`\n`).
 
