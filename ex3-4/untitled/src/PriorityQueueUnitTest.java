@@ -4,97 +4,129 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class PriorityQueueTestCase {
+public class PriorityQueueUnitTest {
 
     private PriorityQueue<Integer> queue;
-    private Comparator<Integer> comparator = Comparator.naturalOrder();
+    final private Comparator<Integer> comparator = Comparator.naturalOrder();
 
 
     @Before
-    public void setUp(){
+    public void inizializeQueue(){
         this.queue = new PriorityQueue<>(comparator);
     }
 
+    /* Test costruttore e stato iniziale */
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorShouldRejectNullComparator() {
+        new PriorityQueue<Integer>(null);
+    }
 
     @Test
-    public void testEmpty() {
+    public void newQueueShouldBeEmpty() {
         assertTrue(queue.empty());
-        queue.push(10);
+        assertEquals(0, queue.heap.size());
+        assertTrue(queue.indexMap.isEmpty()); // Coerenza interna
+    }
+
+    /* Test inserimento */
+    @Test
+    public void pushShouldAddElementToHeap() {
+        queue.push(22);
         assertFalse(queue.empty());
+        assertEquals(1, queue.heap.size());
+        assertTrue(queue.contains(22));
     }
 
-
     @Test
-    public void testPush() {
-        queue.push(10);
-        queue.push(20);
-        queue.push(15);
-        assertEquals(3, queue.heap.size());
-        assertEquals(Integer.valueOf(20), queue.top());
-    }
-
-
-    @Test
-    public void testContains() {
-        queue.push(10);
-        queue.push(20);
-        assertTrue(queue.contains(10));
-        assertFalse(queue.contains(15));
-    }
-
-
-    @Test
-    public void testTop() {
-        assertNull(queue.top());
-        queue.push(10);
-        queue.push(20);
-        queue.push(15);
-        assertEquals(Integer.valueOf(20), queue.top());
-    }
-
-
-    @Test
-    public void testPop() {
-        queue.push(10);
-        queue.push(20);
-        queue.push(15);
-        queue.pop();
-        assertEquals(2, queue.heap.size());
-        assertEquals(Integer.valueOf(15), queue.top());
-    }
-
-
-    @Test
-    public void testRemove() {
-        queue.push(10);
-        queue.push(20);
-        queue.push(15);
-        assertTrue(queue.remove(20));
-        assertFalse(queue.contains(20));
-        assertEquals(2, queue.heap.size());
-    }
-
-
-    @Test
-    public void testPushAndOrder() {
+    public void pushShouldMaintainHeapProperty() {
+        queue.push(22);
         queue.push(5);
-        queue.push(3);
-        queue.push(8);
+        queue.push(23);
+        assertEquals(3, queue.indexMap.size());
+        assertEquals(Integer.valueOf(23), queue.top());
+    }
+    @Test
+    public void topShouldReturnNullWhenEmpty() {
+        assertNull(queue.top());
+    }
+
+    @Test
+    public void topShouldReturnMaxElement() {
+        queue.push(19);
+        queue.push(22);
+        queue.push(17);
         queue.push(1);
-        assertEquals(Integer.valueOf(8), queue.top());
+        assertEquals(Integer.valueOf(22), queue.top());
+    }
+
+
+    /* Test rimozioni */
+    @Test
+    public void popShouldRemoveMaxElement() {
+        queue.push(19);
+        queue.push(22);
+        queue.push(17);
+        queue.push(1);
         queue.pop();
-        assertEquals(Integer.valueOf(5), queue.top());
-        queue.pop();
-        assertEquals(Integer.valueOf(3), queue.top());
-        queue.pop();
-        assertEquals(Integer.valueOf(1), queue.top());
+        assertFalse(queue.contains(22));
+        assertEquals(Integer.valueOf(19), queue.top());
     }
 
 
     @Test
-    public void testRemoveNonExistingElement() {
-        queue.push(10);
-        queue.push(20);
-        assertFalse(queue.remove(30));
+    public void popOnEmptyQueueShouldDoNothing() {
+        queue.pop(); // Non dovrebbe lanciare eccezioni
+        assertTrue(queue.empty());
+    }
+
+
+    @Test
+    public void removeShouldReturnFalseForMissingElements() {
+        assertFalse(queue.remove(1));
+        queue.push(22);
+        assertFalse(queue.remove(11));
+    }
+
+    @Test
+    public void removeShouldDeleteSpecificElement() {
+        queue.push(19);
+        queue.push(22);
+        queue.push(17);
+        queue.push(1);
+        assertTrue(queue.remove(17));
+        assertFalse(queue.contains(17));
+        assertEquals(3, queue.heap.size());
+    }
+
+
+    /* Test casi particolari */
+    @Test
+    public void shouldRejectDuplicateElements() {
+        assertTrue(queue.push(19));  // Primo inserimento dovrebbe riuscire
+        assertFalse(queue.push(19)); // Secondo inserimento dovrebbe fallire
+        assertEquals(1, queue.heap.size()); // Dovrebbe contenere solo un elemento
+        assertEquals(1, queue.indexMap.size()); // Anche la mappa dovrebbe contenere un solo elemento
+
+        queue.pop();
+        assertFalse(queue.contains(19)); // Dopo il pop, l'elemento non dovrebbe più esistere
+    }
+
+    @Test
+    public void removeShouldWorkOnLastElement() {
+        queue.push(19);
+        assertTrue(queue.remove(19));
+        assertTrue(queue.empty());
+    }
+
+    @Test
+    public void testHeapOrderAfterMultipleOperations() {
+        // Sequenza complessa per verificare stabilità
+        queue.push(55);
+        queue.push(37);
+        queue.pop();
+        queue.push(82);
+        queue.push(19);
+        queue.remove(55);
+        assertEquals(Integer.valueOf(82), queue.top());
     }
 }
