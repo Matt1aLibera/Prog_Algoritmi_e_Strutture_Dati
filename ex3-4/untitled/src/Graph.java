@@ -68,14 +68,43 @@ public class Graph<V, L> implements AbstractGraph<V, L> {
 
     @Override
     public boolean removeNode(V a) {
-        return false;
+        if (!containsNode(a)) return false;
+
+        // 1. Rimozione archi uscenti
+        for (V neighbor : getNeighbours(a)) {  // per ogni nodo vicino di a
+            removeEdge(a, neighbor);  // cancello l'arco tra a e il suo vicino (e viceversa se grafo non diretto)
+        }
+        // 2. Rimozione archi entranti rimanenti (ne rimangono solo se il grafo è diretto)
+        if(directed) {
+            for (V node : adiacencyList.keySet()) {  // per ogni nodo nella lista di adiacenza
+                if (!node.equals(a)) {  // che non sia il nodo da rimuovere
+                    adiacencyList.get(node).removeIf(edge -> {  // rimuoviamo l'arco del nodo se:
+                        if (edge.getEnd().equals(a)) {          // è un arco entrante nel nodo da cancellare
+                            numEdges--;  // aggiorno contatore di archi
+                            return true; //allora cancello l'arco
+                        }
+                        return false;    //non lo rimuovo altrimenti
+                    });
+                }
+            }
+        }
+        // 3. Rimozione nodo dopo aver rimosso gli archi
+        adiacencyList.remove(a);
+        return true;
     }
 
     @Override
     public boolean removeEdge(V a, V b) {
+        if (containsEdge(a, b)) {
+            adiacencyList.get(a).removeIf(edge -> edge.getEnd().equals(b));
+            if (!directed) {
+                adiacencyList.get(b).removeIf(edge -> edge.getEnd().equals(a));
+            }
+            numEdges--;
+            return true;
+        }
         return false;
     }
-
     @Override
     public int numNodes() {
         return this.adiacencyList.size();
@@ -88,21 +117,39 @@ public class Graph<V, L> implements AbstractGraph<V, L> {
 
     @Override
     public Collection<V> getNodes() {
-        return null;
+        return adiacencyList.keySet();
     }
 
     @Override
     public Collection<? extends AbstractEdge<V, L>> getEdges() {
-        return null;
+        Set<AbstractEdge<V, L>> allEdges = new HashSet<>();
+        for (Set<AbstractEdge<V, L>> outgoingEdges : adiacencyList.values()) {
+            allEdges.addAll(outgoingEdges);
+        }
+        return allEdges;
+
     }
 
     @Override
     public Collection<V> getNeighbours(V a) {
-        return null;
+        Set<V> neighbours = new HashSet<>();
+        if (containsNode(a)) {
+            for (AbstractEdge<V, L> edge : adiacencyList.get(a)) { //per ogni arco del nodo a
+                neighbours.add(edge.getEnd());//estraiamo tutti i nodi in cui entra l'arco (ovvero i vicini di a)
+            }
+        }
+        return neighbours;
     }
 
     @Override
     public L getLabel(V a, V b) {
+        if (isLabelled() && containsEdge(a, b)) { // se labelled e contiene l'arco da a in b
+            for (AbstractEdge<V, L> edge : adiacencyList.get(a)) { //per ogni arco del nodo a
+                if (edge.getEnd().equals(b)) { //se troviamo quello che ci interessa (da a in b)
+                    return edge.getLabel(); //ritorniamo la sua label
+                }
+            }
+        }
         return null;
     }
 }

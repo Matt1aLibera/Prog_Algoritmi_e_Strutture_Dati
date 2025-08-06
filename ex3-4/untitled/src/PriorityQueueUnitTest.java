@@ -43,7 +43,7 @@ public class PriorityQueueUnitTest {
         queue.push(5);
         queue.push(23);
         assertEquals(3, queue.indexMap.size());
-        assertEquals(Integer.valueOf(23), queue.top());
+        assertEquals(Integer.valueOf(5), queue.top());
     }
     @Test
     public void topShouldReturnNullWhenEmpty() {
@@ -51,25 +51,25 @@ public class PriorityQueueUnitTest {
     }
 
     @Test
-    public void topShouldReturnMaxElement() {
+    public void topShouldReturnMaxPriorityElement() {
         queue.push(19);
         queue.push(22);
         queue.push(17);
         queue.push(1);
-        assertEquals(Integer.valueOf(22), queue.top());
+        assertEquals(Integer.valueOf(1), queue.top());
     }
 
 
     /* Test rimozioni */
     @Test
-    public void popShouldRemoveMaxElement() {
+    public void popShouldRemoveMaxPriorityElement() {
         queue.push(19);
         queue.push(22);
         queue.push(17);
         queue.push(1);
         queue.pop();
-        assertFalse(queue.contains(22));
-        assertEquals(Integer.valueOf(19), queue.top());
+        assertFalse(queue.contains(1));
+        assertEquals(Integer.valueOf(17), queue.top());
     }
 
 
@@ -127,6 +127,6 @@ public class PriorityQueueUnitTest {
         queue.push(82);
         queue.push(19);
         queue.remove(55);
-        assertEquals(Integer.valueOf(82), queue.top());
+        assertEquals(Integer.valueOf(19), queue.top());
     }
 }

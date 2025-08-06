@@ -95,7 +95,7 @@ public class PriorityQueue<E> implements AbstractQueue<E> {
         // Se la coda non è vuota e abbiamo scambiato elementi
         if(position < heap.size()) {
             // Confronta con il genitore per decidere la direzione di riordino
-            if(position > 0 && comparator.compare(heap.get(position), heap.get(getParentIndex(position))) > 0) {
+            if(position > 0 && comparator.compare(heap.get(position), heap.get(getParentIndex(position))) < 0) {
                 heapifyUp(position);  // se l'elemento è più grande del genitore, allora lo facciamo salire
             } else {
                 heapifyDown(position); //se l'elemento è più piccolo o uguale, allora lo facciamo scendere
@@ -110,11 +110,11 @@ public class PriorityQueue<E> implements AbstractQueue<E> {
         int rightChildPos = getRightChildIndex(currentPos);
         int dominantPos = currentPos;
         // Confronta con il figlio sinistro (se esiste)
-        if (leftChildPos < heap.size() && comparator.compare(heap.get(leftChildPos), heap.get(dominantPos)) > 0) {
+        if (leftChildPos < heap.size() && comparator.compare(heap.get(leftChildPos), heap.get(dominantPos)) < 0) {
             dominantPos = leftChildPos;// Il figlio sinistro ha priorità maggiore
         }
         // Confronta con il figlio destro (se esiste)
-        if (rightChildPos < heap.size() && comparator.compare(heap.get(rightChildPos), heap.get(dominantPos)) > 0) {
+        if (rightChildPos < heap.size() && comparator.compare(heap.get(rightChildPos), heap.get(dominantPos)) < 0) {
             dominantPos = rightChildPos;// Il figlio destro ha priorità maggiore
         }
         // Se la posizione dominante è cambiata, scambia e continua a riordinare
@@ -128,7 +128,7 @@ public class PriorityQueue<E> implements AbstractQueue<E> {
     private void heapifyUp(int currentPos) {
         int parentPos = getParentIndex(currentPos);
         // Continua a salire finché l'elemento ha priorità maggiore del genitore
-        while (currentPos > 0 && comparator.compare(heap.get(currentPos), heap.get(parentPos)) > 0) {
+        while (currentPos > 0 && comparator.compare(heap.get(currentPos), heap.get(parentPos)) < 0) {
             swapElements(currentPos, parentPos); // Scambia con il genitore
             currentPos = parentPos;              // Sali al livello superiore
             parentPos = getParentIndex(currentPos); // Aggiorna la posizione del nuovo genitore
