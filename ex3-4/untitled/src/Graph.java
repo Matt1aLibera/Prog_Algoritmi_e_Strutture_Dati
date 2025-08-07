@@ -36,16 +36,22 @@ public class Graph<V, L> implements AbstractGraph<V, L> {
 
     @Override
     public boolean addEdge(V a, V b, L l) {
-        if (containsEdge(a, b) || !containsNode(a) || !containsNode(b)) {//se abbiamo gia l'arco o se non abbiamo i nodi
+        if (containsEdge(a, b) || !containsNode(a) || !containsNode(b)) {
             return false;
-        } else {
-            adiacencyList.get(a).add(new Edge<>(a, b, l)); //aggiungiamo l'arco da a in b
-            if (!directed) {
-                adiacencyList.get(b).add(new Edge<>(b, a, l)); //se non diretto aggiungiamo anche arco b in a
-            }
-            numEdges++;
-            return true;
         }
+        if (isLabelled()) {//se grafo etichettato
+            if (l == null) { // l'arco deve per forza contenere un etichetta
+                return false;
+            }
+        } else {
+            l = null; //se non etichettato allora l'etichetta deve essere sempre null
+        }
+        adiacencyList.get(a).add(new Edge<>(a, b, l));//aggiungo arco
+        if (!directed) {// Se grafo non diretto, aggiungi l'arco inverso
+            adiacencyList.get(b).add(new Edge<>(b, a, l));
+        }
+        numEdges++;
+        return true;
     }
 
     @Override
