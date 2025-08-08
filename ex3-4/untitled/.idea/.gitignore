@@ -6,3 +6,6 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# Modifica temporaneamente il PATH (PowerShell)
+# $env:Path = "C:\Program Files\Java\jdk-13.0.2\bin;" + $env:Path
+#  make run CSV_PATH=".idea/csv/italian_dist_graph.csv"
