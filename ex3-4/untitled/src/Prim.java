@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 
 public class Prim {
     public static void loadGraphAndPopulate(String filePath, Graph<String, Double> graph) throws IOException {
@@ -28,6 +29,13 @@ public class Prim {
                             throw new IllegalArgumentException("Peso non numerico in riga: " + line, e);
                         }
                     });
+        }
+    }
+
+    static class DoubleEdgeComparator<V> implements Comparator<Edge<V, Double>> {
+        @Override
+        public int compare(Edge<V, Double> e1, Edge<V, Double> e2) {
+            return e1.getLabel().compareTo(e2.getLabel());
         }
     }
     public static <V, L extends Number> Collection<? extends AbstractEdge<V, L>> minimumSpanningForest(Graph<V, L> graph) {
