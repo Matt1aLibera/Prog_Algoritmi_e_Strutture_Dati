@@ -37,7 +37,7 @@ run: all
 ifndef CSV_PATH
 	$(error Specificare il percorso CSV con CSV_PATH=path/to/file.csv)
 endif
-	java -cp $(BIN_DIR) Prim "$(CSV_PATH)"
+	java -cp $(BIN_DIR) Prim "" "$(CSV_PATH)"
 
 test-graph: all
 	java -cp "$(BIN_DIR)$(CLASSPATH_SEP)$(LIB_DIR)$(PATH_SEP)junit-4.13.jar$(CLASSPATH_SEP)$(LIB_DIR)$(PATH_SEP)hamcrest-core-1.3.jar" org.junit.runner.JUnitCore GraphUnitTest
