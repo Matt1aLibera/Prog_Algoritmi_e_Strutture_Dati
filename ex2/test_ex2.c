@@ -131,19 +131,13 @@ void test_consistency_across_functions(void) {
     printf("PASS: test_consistency_across_functions\n");
 }
 
-// ==================== TEST MIN FUNCTIONS ====================
+// ==================== TEST MIN FUNCTION ====================
 
 void test_min_functions(void) {
     // Test min3
     if (min3(1, 2, 3) != 1 || min3(3, 2, 1) != 1 || min3(2, 1, 3) != 1 ||
         min3(5, 5, 5) != 5 || min3(INT_MAX, 5, 10) != 5) {
         printf("FAIL: test_min_functions - min3 not working correctly\n");
-        assert(0);
-    }
-    
-    // Test min2
-    if (min2(1, 2) != 1 || min2(2, 1) != 1 || min2(5, 5) != 5) {
-        printf("FAIL: test_min_functions - min2 not working correctly\n");
         assert(0);
     }
     

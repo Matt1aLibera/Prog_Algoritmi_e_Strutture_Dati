@@ -24,15 +24,16 @@ int edit_distance_dyn_helper(const char *s1, const char *s2, int i, int j, int *
     
     if (dp[i][j] != -1) return dp[i][j];
     
+    int d_noop = INT_MAX;
     int result;
+
     if (s1[0] == s2[0]) {
         result = edit_distance_dyn_helper(s1 + 1, s2 + 1, i - 1, j - 1, dp);
-    } else {
+    }else{
         int d_canc = 1 + edit_distance_dyn_helper(s1, s2 + 1, i, j - 1, dp);
         int d_ins = 1 + edit_distance_dyn_helper(s1 + 1, s2, i - 1, j, dp);
-        result = min2(d_canc, d_ins);
+        result = min3(d_noop, d_canc, d_ins);
     }
-    
     dp[i][j] = result;
     return result;
 }
@@ -69,11 +70,4 @@ int min3(int a, int b, int c) {
         min = c;
     }
     return min;
-}
-
-int min2(int a, int b) {
-    if(b < a){
-        return b;
-    }
-    return a;
 }
