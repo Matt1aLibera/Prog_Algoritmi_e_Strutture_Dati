@@ -1,5 +1,7 @@
 #include "main_ex2.h"
+//use "./bin/main_ex2 data/dictionary.txt data/correctme.txt" to run the main program
 
+// avevo cinqve anni, mia made mi perpeteva sempre che la felicita e la chiave della vita. Quando andai a squola mi domandrono come vuolessi essere da grande. Io scrissi: selice. Mi dissero che non avevo capito il corpito, e io dissi loro che non avevano capito la wita.
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         fprintf(stderr, "Usage: %s <dictionary> <correctme> [output]\n", argv[0]);
@@ -81,7 +83,7 @@ void find_min_words(FILE *dictionary, FILE *correctme, FILE *output) {
             suggestions.min_distance = INT_MAX;
 
             for (int i = 0; i < dict_size; i++) {
-                act = edit_distance_dyn(tok, dict_words[i]);
+                act = edit_distance(tok, dict_words[i]);
                 
                 if (act < suggestions.min_distance) {
                     // new minimum distance found, array reset

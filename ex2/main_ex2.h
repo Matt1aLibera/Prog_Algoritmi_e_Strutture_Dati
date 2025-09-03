@@ -11,7 +11,7 @@
 #include "edit_distance.h"
 
 #define WORD_LEN 1024
-#define MAX_SUGGESTIONS 10
+#define MAX_SUGGESTIONS 1
 
 typedef struct {
     char words[MAX_SUGGESTIONS][WORD_LEN]; //array of suggested words
