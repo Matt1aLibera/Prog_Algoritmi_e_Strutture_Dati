@@ -74,7 +74,7 @@ void quick_sort(void *base, size_t nitems, size_t size, int (*compar)(const void
         
         if (subarray_end - subarray_start > 1) {
             // Partition the subarray and get pivot position
-            size_t pivot_index = partition_median_of_three(base, subarray_start, subarray_end, size, compar);
+            size_t pivot_index = partition(base, subarray_start, subarray_end, size, compar);
             
             // Push left subarray to stack if it has more than 1 element
             if (pivot_index - subarray_start > 1) {

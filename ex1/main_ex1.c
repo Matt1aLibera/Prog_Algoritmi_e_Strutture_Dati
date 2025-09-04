@@ -1,5 +1,6 @@
 #include "main_ex1.h"
 #include "sorting_algorithms.h"
+//use "./bin/main_ex1 csv/records.csv csv/sorted.csv 1 1" to run the main
 
 int main(int argc, char *argv[]) {
     // Check for correct number of parameters
@@ -58,7 +59,6 @@ int main(int argc, char *argv[]) {
 void sort_records(FILE *infile, FILE *outfile, size_t field, size_t algo) {
     unsigned long record_count = INITIAL_CAPACITY;
     DataRecord *data_records = read_data_records(infile, &record_count);
-    fclose(infile);
 
     if (record_count == 0) {
         fprintf(stderr, "Error: No records found in input file\n");
@@ -93,7 +93,6 @@ void sort_records(FILE *infile, FILE *outfile, size_t field, size_t algo) {
                 data_records[i].field3);
     }
 
-    fclose(outfile);
     free_data_records(data_records, record_count);
 }
 
@@ -118,16 +117,14 @@ void sorting_controller(void *array, size_t element_count, size_t element_size, 
 }
 
 void free_data_records(DataRecord *records, unsigned long record_count) {
-    
     if (records == NULL) return;
 
     for (unsigned long i = 0; i < record_count; i++) {
         if (records[i].field1 != NULL) {
-            free(records[i].field1); 
-            records[i].field1 = NULL; 
+            free(records[i].field1);
+            records[i].field1 = NULL; // Imposta a NULL dopo il free
         }
     }
-
     free(records); 
 }
 
@@ -183,6 +180,13 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
         exit(EXIT_FAILURE);
     }
 
+    for (unsigned long i = 0; i < current_capacity; i++) {
+        record_array[i].field1 = NULL;
+        record_array[i].id = 0;
+        record_array[i].field2 = 0;
+        record_array[i].field3 = 0.0;
+    }
+
     while (fgets(line_buffer, BUFFER_SIZE, input_file) != NULL) {
         // Remove newline character if present
         line_buffer[strcspn(line_buffer, "\n")] = '\0';
@@ -196,6 +200,14 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
                 exit(EXIT_FAILURE);
             }
             record_array = temp;
+
+            // Inizializza i nuovi elementi
+             for (unsigned long i = records_read; i < current_capacity; i++) {
+                record_array[i].field1 = NULL;
+                record_array[i].id = 0;
+                record_array[i].field2 = 0;
+                record_array[i].field3 = 0.0;
+            }
         }
 
         // Parse CSV fields using sscanf for better safety
@@ -209,7 +221,12 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
 
         if (parse_result != 4) {
             fprintf(stderr, "Error: Failed to parse line %lu - invalid format\n", records_read + 1);
-            continue; // Skip invalid line instead of exiting
+            // INIZIALIZZA COMUNQUE LA STRUTTURA
+            record_array[records_read].field1 = NULL;
+            record_array[records_read].id = 0;
+            record_array[records_read].field2 = 0;
+            record_array[records_read].field3 = 0.0;
+            continue;
         }
 
         // Assign values to record
@@ -228,14 +245,14 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
     }
 
     // Resize to exact number of records read
-    if (records_read > 0) {
+    /*if (records_read > 0) {
         DataRecord *temp = realloc(record_array, records_read * sizeof(DataRecord));
         if (temp == NULL) {
             fprintf(stderr, "Warning: Final memory resize failed, using original allocation\n");
         } else {
             record_array = temp;
         }
-    }
+    }*/
 
     *record_count = records_read;
     return record_array;
