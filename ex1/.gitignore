@@ -1,0 +1,7 @@
+# File oggetto e binari
+*.o
+*.out
+*.exe
+*.bin
+
+ex1/csv/
