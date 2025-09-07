@@ -1,16 +1,44 @@
+/**
+ * @file sorting_algorithms.c
+ * @brief Implementation of sorting algorithms
+ * 
+ * Contains the actual implementation of Merge Sort and Quick Sort algorithms
+ * with various partitioning strategies.
+ */
+
 #include "sorting_algorithms.h"
 
+/**
+ * @brief Recursive Merge Sort implementation
+ * 
+ * Divides the array into halves, recursively sorts them, and then merges
+ * the sorted halves. Time complexity: O(n log n), Space complexity: O(n)
+ * 
+ * @param base Pointer to the first element of the array
+ * @param nitems Number of elements in the array
+ * @param size Size of each element in bytes
+ * @param compare Function pointer to comparison function
+ */
 void merge_sort(void *base, size_t nitems, size_t size, int (*compare)(const void*, const void*)) {
     if (nitems <= 1){
         return;
     }
-        size_t nitems_left = nitems / 2; 
-        size_t nitems_right = nitems - nitems_left;
-        merge_sort(base, nitems_left, size, compare); 
-        merge_sort((char *)base + nitems_left * size, nitems_right, size, compare); 
-        merge(base, nitems_left, nitems_right, size, compare); 
+    size_t nitems_left = nitems / 2; 
+    size_t nitems_right = nitems - nitems_left;
+    merge_sort(base, nitems_left, size, compare); 
+    merge_sort((char *)base + nitems_left * size, nitems_right, size, compare); 
+    merge(base, nitems_left, nitems_right, size, compare); 
 }
 
+/**
+ * @brief Merges two sorted subarrays into one sorted array
+ * 
+ * @param base Pointer to the first element of the array
+ * @param nitems_left Number of elements in the left subarray
+ * @param nitems_right Number of elements in the right subarray
+ * @param size Size of each element in bytes
+ * @param compare Function pointer to comparison function
+ */
 void merge(void *base, size_t nitems_left, size_t nitems_right, size_t size, int (*compare)(const void*, const void*)) {
     size_t nitems_merged = nitems_left + nitems_right; 
     void *merge_buffer = malloc(nitems_merged * size); 
@@ -54,10 +82,22 @@ void merge(void *base, size_t nitems_left, size_t nitems_right, size_t size, int
     free(merge_buffer); 
 }
 
+/**
+ * @brief Iterative Quick Sort implementation using a stack
+ * 
+ * Uses an explicit stack to avoid recursion and prevent stack overflow.
+ * Time complexity: O(n log n) average, O(n²) worst-case.
+ * Space complexity: O(log n) for the stack.
+ * 
+ * @param base Pointer to the first element of the array
+ * @param nitems Number of elements in the array
+ * @param size Size of each element in bytes
+ * @param compare Function pointer to comparison function
+ */
 void quick_sort(void *base, size_t nitems, size_t size, int (*compar)(const void*, const void*)) {
     if (nitems <= 1) return;
     
-    // Stack to menage subarray intervals [low, high), big enough to handle the worst case (nitems*2, all data already sorted)
+    // Stack to manage subarray intervals [low, high), big enough to handle the worst case
     size_t *index_stack = malloc(nitems * sizeof(size_t) * 2);
     if (!index_stack) {
         fprintf(stderr, "Memory allocation failed for quicksort stack\n");
@@ -93,6 +133,16 @@ void quick_sort(void *base, size_t nitems, size_t size, int (*compar)(const void
     free(index_stack);
 }
 
+/**
+ * @brief Partitions array using last element as pivot
+ * 
+ * @param base Pointer to the first element of the array
+ * @param start_index Starting index of the subarray to partition
+ * @param end_index Ending index of the subarray to partition
+ * @param size Size of each element in bytes
+ * @param compare Function pointer to comparison function
+ * @return size_t Index of the pivot element after partitioning
+ */
 size_t partition(void *base, size_t start_index, size_t end_index, size_t size, int (*compare)(const void*, const void*)) {
     
     char *array_base = (char *)base;
@@ -114,6 +164,18 @@ size_t partition(void *base, size_t start_index, size_t end_index, size_t size, 
     return partition_index + 1;
 }
 
+/**
+ * @brief Partitions array using median-of-three pivot selection
+ * 
+ * Improves performance on pre-sorted arrays by choosing a better pivot.
+ * 
+ * @param base Pointer to the first element of the array
+ * @param start_index Starting index of the subarray to partition
+ * @param end_index Ending index of the subarray to partition
+ * @param size Size of each element in bytes
+ * @param compare Function pointer to comparison function
+ * @return size_t Index of the pivot element after partitioning
+ */
 size_t partition_median_of_three(void *base, size_t start_index, size_t end_index, size_t size, int (*compare)(const void*, const void*)) {
     
     char *array_base = (char *)base;
@@ -155,6 +217,13 @@ size_t partition_median_of_three(void *base, size_t start_index, size_t end_inde
     return partition_index + 1;
 }
 
+/**
+ * @brief Swaps two elements of any type using temporary buffer
+ * 
+ * @param element_a Pointer to the first element
+ * @param element_b Pointer to the second element
+ * @param size Size of each element in bytes
+ */
 void swap(void *element_a, void *element_b, size_t size) {
     // Allocate temporary buffer for swapping
     char *temp_buffer = malloc(size);

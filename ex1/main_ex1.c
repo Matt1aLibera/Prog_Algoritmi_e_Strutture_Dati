@@ -1,7 +1,27 @@
+/**
+ * @file main_ex1.c
+ * @brief Main application for sorting CSV records
+ * 
+ * This application reads CSV files containing data records, sorts them
+ * using either MergeSort or QuickSort algorithm on specified fields,
+ * and writes the sorted results to output files.
+ */
 #include "main_ex1.h"
 #include "sorting_algorithms.h"
-//use "./bin/main_ex1 csv/records.csv csv/sorted.csv 1 1" to run the main
 
+/**
+ * @brief Main entry point of the application
+ * 
+ * Parses command line arguments, validates parameters, opens files,
+ * and initiates the sorting process.
+ * 
+ * Usage: ./main_ex1 <input_file> <output_file> <field> <algorithm>
+ * Example: "./bin/main_ex1 csv/records.csv csv/sorted.csv 1 1"
+ * 
+ * @param argc Argument count
+ * @param argv Argument vector
+ * @return int Exit status (EXIT_SUCCESS or EXIT_FAILURE)
+ */
 int main(int argc, char *argv[]) {
     // Check for correct number of parameters
     if (argc != 5) {
@@ -56,6 +76,17 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
+/**
+ * @brief Main sorting workflow function
+ * 
+ * Reads records, selects appropriate comparator, sorts records,
+ * and writes sorted output to file.
+ * 
+ * @param infile Input file pointer
+ * @param outfile Output file pointer
+ * @param field Field to sort by (1=string, 2=integer, 3=double)
+ * @param algo Algorithm to use (1=MergeSort, 2=QuickSort)
+ */
 void sort_records(FILE *infile, FILE *outfile, size_t field, size_t algo) {
     unsigned long record_count = INITIAL_CAPACITY;
     DataRecord *data_records = read_data_records(infile, &record_count);
@@ -96,7 +127,17 @@ void sort_records(FILE *infile, FILE *outfile, size_t field, size_t algo) {
     free_data_records(data_records, record_count);
 }
 
-void sorting_controller(void *array, size_t element_count, size_t element_size, size_t algorithm, int (*comparator)(const void*, const void*)) {
+/**
+ * @brief Controls sorting execution and measures performance
+ * 
+ * @param array Array to sort
+ * @param element_count Number of elements in array
+ * @param element_size Size of each element in bytes
+ * @param algorithm Algorithm to use (1=MergeSort, 2=QuickSort)
+ * @param comparator Comparator function for sorting
+ */
+void sorting_controller(void *array, size_t element_count, size_t element_size, 
+                       size_t algorithm, int (*comparator)(const void*, const void*)) {
     
     clock_t start_time = clock();
     
@@ -116,37 +157,57 @@ void sorting_controller(void *array, size_t element_count, size_t element_size, 
            algorithm_name, element_count, execution_time); 
 }
 
+/**
+ * @brief Frees memory allocated for data records
+ * 
+ * Safely handles NULL pointers and sets pointers to NULL after freeing
+ * 
+ * @param records Array of records to free
+ * @param record_count Number of records in the array
+ */
 void free_data_records(DataRecord *records, unsigned long record_count) {
     if (records == NULL) return;
 
     for (unsigned long i = 0; i < record_count; i++) {
         if (records[i].field1 != NULL) {
             free(records[i].field1);
-            records[i].field1 = NULL; // Imposta a NULL dopo il free
+            records[i].field1 = NULL; // Set to NULL after freeing
         }
     }
     free(records); 
 }
 
-
+/**
+ * @brief Comparator for integer field with overflow protection
+ * 
+ * @param a Pointer to first DataRecord
+ * @param b Pointer to second DataRecord
+ * @return int Negative if a < b, zero if equal, positive if a > b
+ */
 int compare_int_field(const void *a, const void *b) {
     
     const DataRecord *record_a = (const DataRecord*)a; 
     const DataRecord *record_b = (const DataRecord*)b; 
 
-    // Evita overflow per numeri molto grandi
+    // Avoid overflow for very large numbers
     if (record_a->field2 < record_b->field2) return -1;
     if (record_a->field2 > record_b->field2) return 1;
     return 0;
 }
 
-
+/**
+ * @brief Comparator for string field with NULL safety
+ * 
+ * @param a Pointer to first DataRecord
+ * @param b Pointer to second DataRecord
+ * @return int Negative if a < b, zero if equal, positive if a > b
+ */
 int compare_string_field(const void *a, const void *b) {
     
     const DataRecord *record_a = (const DataRecord*)a; 
     const DataRecord *record_b = (const DataRecord*)b;
 
-    // Gestione sicura di stringhe NULL
+    // Safe handling of NULL strings
     if (record_a->field1 == NULL && record_b->field1 == NULL) return 0;
     if (record_a->field1 == NULL) return -1;
     if (record_b->field1 == NULL) return 1;
@@ -154,7 +215,15 @@ int compare_string_field(const void *a, const void *b) {
     return strcmp(record_a->field1, record_b->field1);
 }
 
-
+/**
+ * @brief Comparator for double field with epsilon precision
+ * 
+ * Uses epsilon comparison to handle floating-point precision issues
+ * 
+ * @param a Pointer to first DataRecord
+ * @param b Pointer to second DataRecord
+ * @return int Negative if a < b, zero if equal, positive if a > b
+ */
 int compare_double_field(const void *a, const void *b) {
     
     const DataRecord *record_a = (const DataRecord*)a;  
@@ -169,6 +238,15 @@ int compare_double_field(const void *a, const void *b) {
     return (difference > 0) ? 1 : -1;
 }
 
+/**
+ * @brief Reads CSV records from file into dynamic array
+ * 
+ * Handles memory allocation, parsing, and error checking
+ * 
+ * @param input_file File pointer to read from
+ * @param record_count Pointer to variable that will receive record count
+ * @return DataRecord* Dynamically allocated array of records
+ */
 DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
     char line_buffer[BUFFER_SIZE];
     unsigned long current_capacity = *record_count;
@@ -180,6 +258,7 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
         exit(EXIT_FAILURE);
     }
 
+    // Initialize all records
     for (unsigned long i = 0; i < current_capacity; i++) {
         record_array[i].field1 = NULL;
         record_array[i].id = 0;
@@ -187,10 +266,12 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
         record_array[i].field3 = 0.0;
     }
 
+    // Read and parse each line
     while (fgets(line_buffer, BUFFER_SIZE, input_file) != NULL) {
         // Remove newline character if present
         line_buffer[strcspn(line_buffer, "\n")] = '\0';
         
+        // Resize array if needed
         if (records_read == current_capacity) {
             current_capacity = (current_capacity * 3) / 2 + 1; // 1.5x growth
             DataRecord *temp = realloc(record_array, current_capacity * sizeof(DataRecord));
@@ -201,8 +282,8 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
             }
             record_array = temp;
 
-            // Inizializza i nuovi elementi
-             for (unsigned long i = records_read; i < current_capacity; i++) {
+            // Initialize new elements
+            for (unsigned long i = records_read; i < current_capacity; i++) {
                 record_array[i].field1 = NULL;
                 record_array[i].id = 0;
                 record_array[i].field2 = 0;
@@ -210,7 +291,7 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
             }
         }
 
-        // Parse CSV fields using sscanf for better safety
+        // Parse CSV fields
         int id_value;
         int int_field;
         double double_field;
@@ -221,7 +302,7 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
 
         if (parse_result != 4) {
             fprintf(stderr, "Error: Failed to parse line %lu - invalid format\n", records_read + 1);
-            // INIZIALIZZA COMUNQUE LA STRUTTURA
+            // Initialize structure even if parsing fails
             record_array[records_read].field1 = NULL;
             record_array[records_read].id = 0;
             record_array[records_read].field2 = 0;
@@ -244,20 +325,18 @@ DataRecord* read_data_records(FILE *input_file, unsigned long *record_count) {
         records_read++;
     }
 
-    // Resize to exact number of records read
-    /*if (records_read > 0) {
-        DataRecord *temp = realloc(record_array, records_read * sizeof(DataRecord));
-        if (temp == NULL) {
-            fprintf(stderr, "Warning: Final memory resize failed, using original allocation\n");
-        } else {
-            record_array = temp;
-        }
-    }*/
-
     *record_count = records_read;
     return record_array;
 }
 
+/**
+ * @brief Safe string duplication function
+ * 
+ * Private function that duplicates a string with proper memory allocation
+ * 
+ * @param s String to duplicate
+ * @return char* Duplicated string, or NULL if allocation fails
+ */
 static char *my_strdup(const char *s) {
     if (s == NULL) return NULL;
     
@@ -267,4 +346,4 @@ static char *my_strdup(const char *s) {
         memcpy(copy, s, len);
     }
     return copy;
-};
+}

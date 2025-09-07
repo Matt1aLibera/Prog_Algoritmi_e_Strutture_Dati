@@ -1,7 +1,27 @@
-#include "main_ex2.h"
-//use "./bin/main_ex2 data/dictionary.txt data/correctme.txt" to run the main program
+/**
+ * @file main_ex2.c
+ * @brief Main implementation of spell checker application
+ * 
+ * This file contains the main function and implementation of a spell checker
+ * that uses edit distance algorithms to find corrections for misspelled words.
+ * The application processes text files and provides suggestions from a dictionary.
+ */
 
-// avevo cinqve anni, mia made mi perpeteva sempre che la felicita e la chiave della vita. Quando andai a squola mi domandrono come vuolessi essere da grande. Io scrissi: selice. Mi dissero che non avevo capito il corpito, e io dissi loro che non avevano capito la wita.
+#include "main_ex2.h"
+
+/**
+ * @brief Main entry point of the spell checker application
+ * 
+ * Handles command line arguments, file operations, and coordinates the
+ * spell checking process. Measures and reports execution time.
+ * 
+ * Usage: ./main_ex2 <dictionary> <correctme> [output]
+ * Example: "./bin/main_ex2 data/dictionary.txt data/correctme.txt"
+ * 
+ * @param argc Number of command line arguments
+ * @param argv Array of command line arguments
+ * @return int Exit status (0 for success, non-zero for failure)
+ */
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         fprintf(stderr, "Usage: %s <dictionary> <correctme> [output]\n", argv[0]);
@@ -29,9 +49,9 @@ int main(int argc, char *argv[]) {
     FILE *output;
     int opened = access(output_path, F_OK);  
     if (opened == 0) {
-        output = fopen(output_path, "a"); 
+        output = fopen(output_path, "a"); // Append if file exists
     } else {
-        output = fopen(output_path, "w"); 
+        output = fopen(output_path, "w"); // Create new if file doesn't exist
     }
     
     if (output == NULL) {
@@ -55,11 +75,21 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+/**
+ * @brief Processes text file and finds spelling suggestions
+ * 
+ * Loads dictionary into memory, processes the input text file token by token,
+ * and uses edit distance to find the closest matching words from the dictionary.
+ * 
+ * @param dictionary File pointer to dictionary word list
+ * @param correctme File pointer to text file to spell check
+ * @param output File pointer for output results
+ */
 void find_min_words(FILE *dictionary, FILE *correctme, FILE *output) {
     char input[WORD_LEN];
     int act;
     
-    // load dictionary in memory
+    // Load dictionary into memory for efficient access
     char **dict_words = NULL;
     int dict_size = 0;
     char word[WORD_LEN];
@@ -73,20 +103,23 @@ void find_min_words(FILE *dictionary, FILE *correctme, FILE *output) {
     }
     printf("Loaded %d words from dictionary\n", dict_size);
 
+    // Process each line of the input file
     while (fgets(input, sizeof(input), correctme) != NULL) {
         char *tok = strtok(input, ",.\t \n");
         while (tok != NULL) {
+            // Convert first character to lowercase for case-insensitive comparison
             tok[0] = tolower(tok[0]);
             
             Suggestions suggestions;
             suggestions.count = 0;
             suggestions.min_distance = INT_MAX;
 
+            // Compare current word against all dictionary words
             for (int i = 0; i < dict_size; i++) {
-                act = edit_distance(tok, dict_words[i]);
+                act = edit_distance_dyn(tok, dict_words[i]);
                 
                 if (act < suggestions.min_distance) {
-                    // new minimum distance found, array reset
+                    // New minimum distance found, reset suggestions array
                     suggestions.min_distance = act;
                     suggestions.count = 0;
                     strncpy(suggestions.words[suggestions.count], dict_words[i], WORD_LEN - 1);
@@ -94,7 +127,7 @@ void find_min_words(FILE *dictionary, FILE *correctme, FILE *output) {
                     suggestions.count++;
                 } 
                 else if (act == suggestions.min_distance && suggestions.count < MAX_SUGGESTIONS) {
-                    // adds new found min distance word to the array
+                    // Add new word with same minimum distance to suggestions
                     strncpy(suggestions.words[suggestions.count], dict_words[i], WORD_LEN - 1);
                     suggestions.words[suggestions.count][WORD_LEN - 1] = '\0';
                     suggestions.count++;
@@ -106,13 +139,23 @@ void find_min_words(FILE *dictionary, FILE *correctme, FILE *output) {
         }
     }
     
-    // free memory
+    // Free allocated memory for dictionary
     for (int i = 0; i < dict_size; i++) {
         free(dict_words[i]);
     }
     free(dict_words);
 }
 
+/**
+ * @brief Formats and writes suggestions to output file
+ * 
+ * Creates a formatted output showing the original word, minimum edit distance,
+ * and suggested corrections (if any).
+ * 
+ * @param output File pointer for output
+ * @param word The original word that was checked
+ * @param suggestions Structure containing correction suggestions
+ */
 void print_suggestions(FILE *output, const char *word, Suggestions *suggestions) {
     fprintf(output, "Word: %s\n", word);
     fprintf(output, "Min_distance: %d\n", suggestions->min_distance);
