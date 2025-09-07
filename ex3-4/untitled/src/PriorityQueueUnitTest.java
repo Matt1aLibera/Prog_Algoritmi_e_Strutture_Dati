@@ -3,7 +3,17 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-
+/**
+ * Unit test class for the PriorityQueue implementation.
+ *
+ * This class contains comprehensive tests for the PriorityQueue class, verifying
+ * the correctness of all major operations and edge cases. The tests ensure that
+ * the priority queue maintains proper heap invariants and provides expected behavior
+ * for a min-heap using natural ordering.
+ *
+ * The tests use Integer elements with natural ordering to verify the min-heap
+ * behavior where the smallest element has the highest priority.
+ */
 public class PriorityQueueUnitTest {
 
     private PriorityQueue<Integer> queue;
@@ -15,7 +25,6 @@ public class PriorityQueueUnitTest {
         this.queue = new PriorityQueue<>(comparator);
     }
 
-    /* Test costruttore e stato iniziale */
     @Test(expected = IllegalArgumentException.class)
     public void constructorShouldRejectNullComparator() {
         new PriorityQueue<Integer>(null);
@@ -28,7 +37,6 @@ public class PriorityQueueUnitTest {
         assertTrue(queue.indexMap.isEmpty()); // Coerenza interna
     }
 
-    /* Test inserimento */
     @Test
     public void pushShouldAddElementToHeap() {
         queue.push(22);

@@ -2,7 +2,15 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.Collection;
-
+/**
+ * Unit test class for the Graph implementation.
+ *
+ * This class contains comprehensive tests for the Graph class, covering
+ * all major functionalities including graph construction, node and edge
+ * operations, and graph properties verification. The tests are organized
+ * into logical sections and use both directed/labelled and undirected/unlabelled
+ * graph instances to ensure complete coverage.
+ */
 public class GraphUnitTest {
     private Graph<String, Integer> directedLabelledGraph;
     private Graph<String, Void> undirectedUnlabelledGraph;

@@ -3,44 +3,93 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Implementation of Prim's algorithm for finding Minimum Spanning Trees (MST)
+ * and Minimum Spanning Forests (MSF) in undirected, weighted graphs.
+ *
+ * This class provides functionality to:
+ * - Load graph data from CSV files
+ * - Compute minimum spanning forests using Prim's algorithm
+ * - Output results in CSV format with statistical information
+ *
+ * The algorithm handles both connected graphs (producing a single MST) and
+ * disconnected graphs (producing a MSF with multiple trees).
+ */
 public class Prim {
+
+    /**
+     * Loads graph data from a CSV file and populates the provided graph.
+     *
+     * The expected CSV format is: "source,target,weight" per line.
+     * Spaces around commas are automatically trimmed.
+     *
+     * @param filePath the path to the CSV file containing graph data
+     * @param graph the graph to populate with nodes and edges
+     * @throws IOException if an I/O error occurs reading the file
+     * @throws IllegalArgumentException if the file format is invalid
+     */
     public static void loadGraphAndPopulate(String filePath, Graph<String, Double> graph) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             br.lines()
-                    .filter(line -> !line.trim().isEmpty())  // Ignora righe vuote
+                    .filter(line -> !line.trim().isEmpty())  // Ignore empty lines
                     .forEach(line -> {
-                        String[] parts = line.split("\\s*,\\s*");  // Split che ignora spazi
+                        String[] parts = line.split("\\s*,\\s*");  // Split ignoring spaces
                         if (parts.length != 3) {
-                            throw new IllegalArgumentException("Formato riga non valido: " + line);
+                            throw new IllegalArgumentException("Invalid line format: " + line);
                         }
                         try {
                             String source = parts[0];
                             String target = parts[1];
                             double weight = Double.parseDouble(parts[2]);
 
-                            // Aggiungi nodi se non esistono già (idempotente)
+                            // Add nodes if they don't exist (idempotent)
                             graph.addNode(source);
                             graph.addNode(target);
 
-                            // Aggiungi arco
+                            // Add edge
                             graph.addEdge(source, target, weight);
                         } catch (NumberFormatException e) {
-                            throw new IllegalArgumentException("Peso non numerico in riga: " + line, e);
+                            throw new IllegalArgumentException("Non-numeric weight in line: " + line, e);
                         }
                     });
         }
-
-
     }
 
+    /**
+     * Comparator for comparing edges based on their numeric labels (weights).
+     * Used by the priority queue to always select the edge with minimum weight.
+     *
+     * @param <V> the type of vertices
+     * @param <L> the type of edge labels (must extend Number)
+     */
     static class DoubleEdgeComparator<V, L> implements Comparator<Edge<V, L>> {
+        /**
+         * Compares two edges based on their numeric labels.
+         *
+         * @param e1 the first edge to compare
+         * @param e2 the second edge to compare
+         * @return a negative integer, zero, or positive integer as the first edge's
+         *         weight is less than, equal to, or greater than the second edge's weight
+         */
         @Override
         public int compare(Edge<V, L> e1, Edge<V, L> e2) {
-            // Soluzione 1: Per tipi Number generici (più lenta)
             return Double.compare((Double) e1.getLabel(), (Double) e2.getLabel());
         }
     }
 
+    /**
+     * Computes the Minimum Spanning Forest (MSF) of an undirected weighted graph
+     * using Prim's algorithm.
+     *
+     * For connected graphs, this returns a single Minimum Spanning Tree (MST).
+     * For disconnected graphs, this returns a forest of MSTs for each connected component.
+     *
+     * @param <V> the type of vertices in the graph
+     * @param <L> the type of edge labels (must extend Number)
+     * @param graph the input graph (must be undirected and weighted)
+     * @return a collection of edges forming the Minimum Spanning Forest
+     * @throws RuntimeException if the graph contains invalid data
+     */
     public static <V, L extends Number> Collection<? extends AbstractEdge<V, L>> minimumSpanningForest(Graph<V, L> graph) {
         List<AbstractEdge<V, L>> minimumSpanningForest = new ArrayList<>();
         if (graph == null || graph.numNodes() == 0) {
@@ -49,35 +98,36 @@ public class Prim {
 
         try {
             PriorityQueue<Edge<V, L>> priorityQueue = new PriorityQueue<>(new DoubleEdgeComparator<>());
-
             Set<V> visitedNodes = new HashSet<>(graph.numNodes());
 
-            for (V node : graph.getNodes()) { // Itera su tutti i nodi del grafo per gestire anche grafi non connessi
-                if (visitedNodes.add(node)) { //aggiungiamo il nodo a quelli visitati, se è gia presente allora passiamo al prossimo
-                    while (visitedNodes.size() < graph.numNodes()) { //se non abbiamo ancora visitato tutti i nodi del grafo
-                        for (V neighbour : graph.getNeighbours(node)) { //aggiungiamo alla PQ tutti gli archi verso nodi non visitati (archi uscenti del nodo che stiamo visitando)
+            for (V node : graph.getNodes()) { // Iterate over all nodes to handle disconnected graphs
+                if (visitedNodes.add(node)) { // Add node to visited set, skip if already visited
+                    while (visitedNodes.size() < graph.numNodes()) { // Continue until all nodes visited
+                        // Add all edges to unvisited neighbors to the priority queue
+                        for (V neighbour : graph.getNeighbours(node)) {
                             if (!visitedNodes.contains(neighbour)) {
                                 Edge<V, L> edge = new Edge<>(node, neighbour, graph.getLabel(node, neighbour));
                                 priorityQueue.push(edge);
                             }
                         }
 
-                        Edge<V, L> minEdge = priorityQueue.top(); //estraiamo arco con peso minimo che porta ad un nodo non visitato
+                        // Find the minimum weight edge leading to an unvisited node
+                        Edge<V, L> minEdge = priorityQueue.top();
                         while (minEdge != null && visitedNodes.contains(minEdge.getEnd())) {
                             priorityQueue.pop();
                             minEdge = priorityQueue.top();
                         }
 
                         if (minEdge == null) {
-                            break;  // non ci sono piu archi validi nella coda, passiamo ad un altro nodo del grafo non alcora visitato
+                            break;  // No valid edges in queue, move to next unvisited node
                         }
-                        minimumSpanningForest.add(minEdge); //se no aggiungiamo alla foresta il nodo analizzato (sorgente)
-                        visitedNodes.add(minEdge.getEnd()); //aggiungiamo ai visitati la destinazione dell'arco uscente dalla sorgente
-                        node = minEdge.getEnd(); //nodo destinazione diventa il n uovo nodo sorgente da analizzare
+                        minimumSpanningForest.add(minEdge); // Add edge to MSF
+                        visitedNodes.add(minEdge.getEnd()); // Mark destination node as visited
+                        node = minEdge.getEnd(); // Continue from the destination node
                     }
 
                     if (visitedNodes.size() == graph.numNodes()) {
-                        break; //abbiamo visitato tutti i nodi del grafo, wtermino anticipatamente
+                        break; // All nodes visited, terminate early
                     }
                 }
             }
@@ -87,24 +137,37 @@ public class Prim {
         return minimumSpanningForest;
     }
 
+    /**
+     * Main method for command-line execution of Prim's algorithm.
+     *
+     * Usage: java Prim [input_file.csv]
+     *
+     * Outputs:
+     * - Standard output: CSV representation of the Minimum Spanning Forest
+     * - Standard error: Statistical information about the computed forest
+     *
+     * @param args command-line arguments (args[1] should contain the CSV file path)
+     */
     public static void main(String[] args) {
-        // leggi i dati CSV del grafo dal percorso in args[1]
+        // Read graph data from CSV file specified in args[1]
         if (args.length < 2) {
-            System.err.println("Specificare il percorso del file CSV");
+            System.err.println("Please specify the CSV file path");
             return;
         }
 
-        Graph<String, Double> graph = new Graph<>(false, true);  // Non orientato, pesato
+        Graph<String, Double> graph = new Graph<>(false, true);  // Undirected, weighted
         try {
             loadGraphAndPopulate(args[1], graph);
-            System.out.println("Grafo caricato: " + graph.numNodes() + " nodi, " +
-                    graph.numEdges() + " archi.");
+            System.out.println("Graph loaded: " + graph.numNodes() + " nodes, " +
+                    graph.numEdges() + " edges.");
         } catch (Exception e) {
-            System.err.println("Errore: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         }
-        // calcola la minima foresta ricoprente con minimumSpanningForest
+
+        // Compute Minimum Spanning Forest
         Collection<? extends AbstractEdge<String, Double>> minimumSpanningForest = minimumSpanningForest(graph);
-        // standard output: descrizione della foresta calcolata come CSV con formato analogo a quello in input
+
+        // Standard output: CSV representation of the forest (same format as input)
         double totalWeight = 0.0;
         for (AbstractEdge<String, Double> edge : minimumSpanningForest) {
             System.out.println(
@@ -113,7 +176,8 @@ public class Prim {
                             edge.getLabel());
             totalWeight += edge.getLabel();
         }
-        // standard error: numero alberi della foresta, numero di nodi totali, n archi nella foresta calcolata, peso totale della foresta in km
+
+        // Standard error: Statistical information about the forest
         System.err.println("\nForest stats:");
         System.err.println("- Connected components: " + (graph.numNodes() - minimumSpanningForest.size()));
         System.err.println("- Total nodes: " + graph.numNodes());
