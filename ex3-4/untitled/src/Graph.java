@@ -216,8 +216,8 @@ public class Graph<V, L> implements AbstractGraph<V, L> {
     @Override
     public Collection<? extends AbstractEdge<V, L>> getEdges() {
         Set<AbstractEdge<V, L>> allEdges = new HashSet<>();
-        for (Set<AbstractEdge<V, L>> outgoingEdges : adiacencyList.values()) {
-            allEdges.addAll(outgoingEdges);
+        for (Set<AbstractEdge<V, L>> outgoingEdges : adiacencyList.values()) {//iteara su tutti i valori della adiacency list
+            allEdges.addAll(outgoingEdges);//agginge tutti gli archi
         }
         return allEdges;
     }

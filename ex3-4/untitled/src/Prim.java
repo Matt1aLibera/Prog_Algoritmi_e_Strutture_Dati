@@ -22,6 +22,7 @@ public class Prim {
      *
      * The expected CSV format is: "source,target,weight" per line.
      * Spaces around commas are automatically trimmed.
+     * To run: make run  CSV_PATH=.idea/csv/italian_dist_graph.csv
      *
      * @param filePath the path to the CSV file containing graph data
      * @param graph the graph to populate with nodes and edges

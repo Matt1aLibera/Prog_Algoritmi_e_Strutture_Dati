@@ -230,4 +230,14 @@ public class GraphUnitTest {
         assertEquals(2, directedLabelledGraph.numNodes());
         assertEquals(0, directedLabelledGraph.numEdges());
     }
+
+    @Test
+    public void undirectedEdgeShouldReturnOneEdge(){
+        undirectedUnlabelledGraph.addNode(nodeA);
+        undirectedUnlabelledGraph.addNode(nodeB);
+        undirectedUnlabelledGraph.addNode(nodeC);
+        undirectedUnlabelledGraph.addEdge(nodeA, nodeB, null);//aggiungiamo un arco non diretto
+        assertEquals(3,undirectedUnlabelledGraph.numNodes());
+        assertEquals(1, undirectedUnlabelledGraph.getEdges().size()); //ci aspettiamo solo un arco ma restituisce 2
+    }
 }
