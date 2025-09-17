@@ -20,7 +20,7 @@
 #include "edit_distance.h"
 
 #define WORD_LEN 1024        /**< Maximum length for a word */
-#define MAX_SUGGESTIONS 1    /**< Maximum number of suggestions to provide per word */
+#define MAX_SUGGESTIONS 10    /**< Maximum number of suggestions to provide per word */
 
 /**
  * @brief Structure to hold spelling suggestions for a word

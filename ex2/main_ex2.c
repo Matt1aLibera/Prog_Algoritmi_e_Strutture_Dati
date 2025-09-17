@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     
-    const char *output_path = (argc > 3) ? argv[3] : "./data/output.txt";
+    const char *output_path = (argc > 3) ? argv[3] : "/dev/stdout";
     
     printf("Attempting to open files:\n");
     printf("Dictionary: %s\n", argv[1]);
@@ -94,12 +94,12 @@ void find_min_words(FILE *dictionary, FILE *correctme, FILE *output) {
     int dict_size = 0;
     char word[WORD_LEN];
     
-    rewind(dictionary);
-    while (fscanf(dictionary, "%1023s", word) != EOF) {
-        dict_words = realloc(dict_words, (dict_size + 1) * sizeof(char *));
-        dict_words[dict_size] = malloc(strlen(word) + 1);
-        strcpy(dict_words[dict_size], word);
-        dict_size++;
+    rewind(dictionary); //Riposiziona il puntatore del file all'inizio,Assicura che leggi il file dall'inizio 
+    while (fscanf(dictionary, "%1023s", word) != EOF) { //Legge una parola alla volta dal file fino alla fine 
+        dict_words = realloc(dict_words, (dict_size + 1) * sizeof(char *)); //Rialloca l'array di puntatori per fare spazio a un nuovo elemento
+        dict_words[dict_size] = malloc(strlen(word) + 1); //Alloca memoria per la parola appena letta
+        strcpy(dict_words[dict_size], word);//Copia la parola dalla memoria temporanea a quella allocata
+        dict_size++; //Incrementa il contatore del dizionario
     }
     printf("Loaded %d words from dictionary\n", dict_size);
 
@@ -122,8 +122,8 @@ void find_min_words(FILE *dictionary, FILE *correctme, FILE *output) {
                     // New minimum distance found, reset suggestions array
                     suggestions.min_distance = act;
                     suggestions.count = 0;
-                    strncpy(suggestions.words[suggestions.count], dict_words[i], WORD_LEN - 1);
-                    suggestions.words[suggestions.count][WORD_LEN - 1] = '\0';
+                    strncpy(suggestions.words[suggestions.count], dict_words[i], WORD_LEN - 1);//copia la nuova parola migliore, Copia al massimo WORD_LEN - 1 caratteri da dict_words[i] a suggestions.words[suggestions.count]
+                    suggestions.words[suggestions.count][WORD_LEN - 1] = '\0';//termina manualmente la stringa
                     suggestions.count++;
                 } 
                 else if (act == suggestions.min_distance && suggestions.count < MAX_SUGGESTIONS) {

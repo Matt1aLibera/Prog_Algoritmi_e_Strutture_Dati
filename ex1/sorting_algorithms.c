@@ -54,7 +54,7 @@ void merge(void *base, size_t nitems_left, size_t nitems_right, size_t size, int
 
     while (left_index < nitems_left && right_index < nitems_right) {
         if (compare(left_array + left_index * size, right_array + right_index * size) <= 0) {
-            memcpy(merge_buffer + buffer_index * size, left_array + left_index * size, size); 
+            memcpy(merge_buffer + buffer_index * size, left_array + left_index * size, size); //memcpy(dest, src, size)
             left_index++; 
         } else {
             memcpy(merge_buffer + buffer_index * size, right_array + right_index * size, size); 
