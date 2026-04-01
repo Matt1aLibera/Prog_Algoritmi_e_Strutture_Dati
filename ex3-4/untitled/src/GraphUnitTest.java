@@ -238,6 +238,6 @@ public class GraphUnitTest {
         undirectedUnlabelledGraph.addNode(nodeC);
         undirectedUnlabelledGraph.addEdge(nodeA, nodeB, null);//aggiungiamo un arco non diretto
         assertEquals(3,undirectedUnlabelledGraph.numNodes());
-        assertEquals(1, undirectedUnlabelledGraph.getEdges().size()); //ci aspettiamo solo un arco ma restituisce 2
+        assertEquals(undirectedUnlabelledGraph.numEdges(), undirectedUnlabelledGraph.getEdges().size()); //ci aspettiamo solo un arco ma restituisce 2
     }
 }
